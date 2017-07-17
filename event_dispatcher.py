@@ -43,7 +43,7 @@ class EventDispatcher(object):
     # TO DO need to keep connection to sqs open
     # use async lib to enqueue in another thread
     queue = connect_to_sqs() 
-    logging.info('sending event' + str(json.dumps(event.params)))
+    logging.info('Writing event to SQS:' + str(json.dumps(event.params)))
 
     visitor = event.params['visitors'][0]['visitor_id']
     attributes = event.params['visitors'][0]['attributes']

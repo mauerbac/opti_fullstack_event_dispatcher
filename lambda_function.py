@@ -6,19 +6,19 @@ import requests
 
 def lambda_handler(event, context):
 
-  project_id = '8449080257' # required field
+  project_id = 'xxxxxxx' # Provide project_id
 
   sqs = boto3.resource('sqs',region_name='us-west-2')
   queue = sqs.get_queue_by_name(QueueName='event-queue')
-  
-  # get base level events 1) use datafile 2) look at a single event ?
-  # create base object
-  # get basic info
-  url = 'https://cdn.optimizely.com/json/{}.json'.format(project_id)
-  datafile = requests.get(url).text
-  config = json.loads(datafile)
 
-  account_id = config.get('accountId')
+  # Option 1: Use datafile to provide account_id 
+  #url = 'https://cdn.optimizely.com/json/{}.json'.format(project_id)
+  #datafile = requests.get(url).text
+  #config = json.loads(datafile)
+  #account_id = config.get('accountId')
+  
+  # Option 2: Hard code project/account ID 
+  account_id = 'xxxxxxxx'  # Provide account_id
   client_name = 'python-sdk'
   client_version = '1.2.0'
 
@@ -30,17 +30,17 @@ def lambda_handler(event, context):
     'visitors': [] 
   }
 
-  items_hold = []
+  items_temp = []
   user_map = {}
   attributes_map = {}
 
+  # Poll SQS -- with few events you must poll sqs multiple times. items_temp is used to ensure we have all events
   for x in range(0, 5):
     items = queue.receive_messages(WaitTimeSeconds=1, MaxNumberOfMessages=10)
-    items_hold.extend(items)
+    items_temp.extend(items)
 
-  # to do : check items exist in here
-  # build map dict
-  for item in items_hold:
+  # Build a mapping of visitors to snapshot and visitors to attributes 
+  for item in items_temp:
     decode_item = json.loads(item.body)
     key = decode_item.keys()[0]
     attributes = decode_item[key][0]
@@ -49,10 +49,10 @@ def lambda_handler(event, context):
       user_map[key].append(snapshot)
     else:
       user_map[key] = [snapshot]
-      # also store attributes
       attributes_map[key] = attributes
     item.delete()
 
+  # Build single request objet
   for visitor in user_map:
     entry = {
       'visitor_id': visitor,
@@ -61,9 +61,7 @@ def lambda_handler(event, context):
     }
     obj['visitors'].append(entry)
 
-  print("batch event object ", obj)
   # send object
   requests.post('https://logx.optimizely.com/v1/events', data=json.dumps(obj), headers={'Content-Type': 'application/json'})
-
 
   return True
