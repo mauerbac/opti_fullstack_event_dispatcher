@@ -40,8 +40,6 @@ class EventDispatcher(object):
     Args:
       event: Object holding information about the request to be dispatched to AWS SQS
     """
-    # TO DO need to keep connection to sqs open
-    # use async lib to enqueue in another thread
     queue = connect_to_sqs() 
     logging.info('Writing event to SQS:' + str(json.dumps(event.params)))
 
