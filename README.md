@@ -67,5 +67,5 @@ A few thoughts on improvements:
 
 * In `event_dispatcher.py`, use an async library to write to SQS to improve performance
 * Keep the connection to SQS open. Ideally, this should be done when the Optimizely client is initialized and should be persisted. 
-* re-try logic: Handle for cases where SQS or Optimizely could be down 
+* Re-try logic: Handle for cases where SQS or Optimizely could be down 
 
