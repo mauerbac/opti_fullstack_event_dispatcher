@@ -35,6 +35,8 @@ optimizely_client = optimizely.Optimizely(datafile,
 
 2. Provide the Python SDK with your AWS credentials. Ideally, use environment variables: `AWS_KEY` & `AWS_SECRET`. Note: I’ve set the region to `us-west-2`.  
 
+3. The SDK's EventBuilder must use the class `EventBuilderV3`, which builds events in bulk format. To do this, change the class in `optimizely.py` [here](https://github.com/optimizely/python-sdk/blob/master/optimizely/optimizely.py#L80) to `self.event_builder = event_builder.EventBuilderV3(self.config)`
+
 3. Rebuild & install the SDK. Instructions in the Python SDK [readme](https://github.com/optimizely/python-sdk/blob/master/README.md).
 
 ## Consumer
