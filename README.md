@@ -53,4 +53,17 @@ __Lambda__
 8. Under advanced settings, set the timeout to 1 minute. Depending on the workload, you might need to increase this.
 9. Create the function!
 
+# Performance
+
+This bulk dispatcher provides many performance and cost saving benefits.
+
+* In the same AWS region, calls to SQS are sub millisecond, whereas hitting Optimizely's endpoint directly is ~60 milliseconds.
+* AWS charges per HTTP call to the outside world. Millions of events can get costly and sending in bulk greatly reduces this.
+
+# Next steps
+
+A few thoughts:
+
+* In `event_dispatcher.py`, use an async library to write to SQS to improve performance
+* Keep the connection to SQS open. Ideally, this should be done when the Optimizely client is initialized and should be persisted. 
 
